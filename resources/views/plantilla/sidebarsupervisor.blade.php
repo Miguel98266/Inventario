@@ -14,7 +14,7 @@
                                 <a class="nav-link" href="#"><i class="icon-bag"></i> Categorías</a>
                             </li>
                             <li @click="menu=2" class="nav-item">
-                                <a class="nav-link" href="#"><i class="icon-bag"></i> Artículos</a>
+                                <a class="nav-link" href="#"><i class="icon-bag"></i> Insumos</a>
                             </li>
                         </ul>
                     </li>

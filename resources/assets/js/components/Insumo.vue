@@ -2,14 +2,14 @@
             <main class="main">
             <!-- Breadcrumb -->
             <ol class="breadcrumb">
-               <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
+                <li class="breadcrumb-item"><a href="/">Escritorio</a></li>
             </ol>
             <div class="container-fluid">
                 <!-- Ejemplo de tabla Listado -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> Categorías
-                        <button type="button" @click="abrirModal('categoria','registrar')" class="btn btn-secondary">
+                        <i class="fa fa-align-justify"></i> Insumos
+                        <button type="button" @click="abrirModal('insumo','registrar')" class="btn btn-secondary">
                             <i class="icon-plus"></i>&nbsp;Nuevo
                         </button>
                     </div>
@@ -19,10 +19,10 @@
                                 <div class="input-group">
                                     <select class="form-control col-md-3" v-model="criterio">
                                       <option value="nombre">Nombre</option>
-                                      <option value="descripcion">Descripción</option>
+                                      <option value="ubicacion">Ubicacion</option>
                                     </select>
-                                    <input type="text" v-model="buscar" @keyup.enter="listarCategoria(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
-                                    <button type="submit" @click="listarCategoria(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
+                                    <input type="text" v-model="buscar" @keyup.enter="listarInsumo(1,buscar,criterio)" class="form-control" placeholder="Texto a buscar">
+                                    <button type="submit" @click="listarInsumo(1,buscar,criterio)" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</button>
                                 </div>
                             </div>
                         </div>
@@ -30,32 +30,41 @@
                             <thead>
                                 <tr>
                                     <th>Opciones</th>
+                                    <th>Codigo</th>
                                     <th>Nombre</th>
-                                    <th>Descripción</th>
+                                    <th>Categoria</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Ubicacion</th>
                                     <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="categoria in arrayCategoria" :key="categoria.id">
+                                <tr v-for="insumo in arrayInsumo" :key="insumo.id">
                                     <td>
-                                        <button type="button" @click="abrirModal('categoria','actualizar',categoria)" class="btn btn-warning btn-sm">
+                                        <button type="button" @click="abrirModal('insumo','actualizar',insumo)" class="btn btn-warning btn-sm">
                                           <i class="icon-pencil"></i>
                                         </button> &nbsp;
-                                        <template v-if="categoria.condicion">
-                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarCategoria(categoria.id)">
+                                        <template v-if="insumo.condicion">
+                                            <button type="button" class="btn btn-danger btn-sm" @click="desactivarInsumo(insumo.id)">
                                                 <i class="icon-trash"></i>
                                             </button>
                                         </template>
                                         <template v-else>
-                                            <button type="button" class="btn btn-info btn-sm" @click="activarCategoria(categoria.id)">
+                                            <button type="button" class="btn btn-info btn-sm" @click="activarInsumo(insumo.id)">
                                                 <i class="icon-check"></i>
                                             </button>
                                         </template>
                                     </td>
-                                    <td v-text="categoria.nombre"></td>
-                                    <td v-text="categoria.descripcion"></td>
+                                    <td v-text="insumo.codigo"></td>
+                                    <td v-text="insumo.nombre"></td>
+                                    <td v-text="insumo.nombre_categoria"></td>
+                                    <td v-text="insumo.precio_insumo"></td>
+                                    <td v-text="insumo.stock"></td>
+                                    <td v-text="insumo.ubicacion"></td>
+                                    
                                     <td>
-                                        <div v-if="categoria.condicion">
+                                        <div v-if="insumo.condicion">
                                             <span class="badge badge-success">Activo</span>
                                         </div>
                                         <div v-else>
@@ -96,21 +105,51 @@
                         <div class="modal-body">
                             <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
                                 <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Categoria</label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" v-model="idcategoria">
+                                            <option value="0" disabled>Seleccione</option>
+                                            <option v-for="categoria in arrayCategoria" :key="categoria.id" :value="categoria.id" v-text="categoria.nombre"></option>
+                                        </select>
+                                </div>
+                                    </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Código</label>
+                                    <div class="col-md-9">
+                                        <input type="text" v-model="codigo" class="form-control" placeholder="Codigo de barras">
+                                        <barcode :value="codigo" :options="{format: 'EAN-13'}">
+                                            Generando codigo.
+                                        </barcode>
+                                    </div>
+                                </div>                                
+                                <div class="form-group row">
                                     <label class="col-md-3 form-control-label" for="text-input">Nombre</label>
                                     <div class="col-md-9">
-                                        <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de categoría">
-                                        
+                                        <input type="text" v-model="nombre" class="form-control" placeholder="Nombre de insumo">
+                                
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-md-3 form-control-label" for="text-input">Descripción</label>
+                                    <label class="col-md-3 form-control-label" for="text-input">Precio</label>
                                     <div class="col-md-9">
-                                        <input type="text" v-model="descripcion" class="form-control" placeholder="Ingrese descripción">
+                                        <input type="number" v-model="precio_insumo" class="form-control" placeholder="">
                                     </div>
                                 </div>
-                                <div v-show="errorCategoria" class="form-group row div-error">
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="text-input">Stock</label>
+                                    <div class="col-md-9">
+                                        <input type="number" v-model="stock" class="form-control" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 form-control-label" for="email-input">Ubicación</label>
+                                    <div class="col-md-9">
+                                        <input type="email" v-model="ubicacion" class="form-control" placeholder="Ingrese la ubicación">
+                                    </div>
+                                </div>
+                                <div v-show="errorInsumo" class="form-group row div-error">
                                     <div class="text-center text-error">
-                                        <div v-for="error in errorMostrarMsjCategoria" :key="error" v-text="error">
+                                        <div v-for="error in errorMostrarMsjInsumo" :key="error" v-text="error">
 
                                         </div>
                                     </div>
@@ -120,8 +159,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" @click="cerrarModal()">Cerrar</button>
-                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarCategoria()">Guardar</button>
-                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarCategoria()">Actualizar</button>
+                            <button type="button" v-if="tipoAccion==1" class="btn btn-primary" @click="registrarInsumo()">Guardar</button>
+                            <button type="button" v-if="tipoAccion==2" class="btn btn-primary" @click="actualizarInsumo()">Actualizar</button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -133,18 +172,24 @@
 </template>
 
 <script>
+import VueBarcode from 'vue-barcode';
     export default {
         data (){
             return {
-                categoria_id: 0,
+                insumo_id: 0,
+                idcategoria: 0,
+                nombre_categoria:'',
+                codigo:'',
                 nombre : '',
-                descripcion : '',
-                arrayCategoria : [],
+                precio_insumo:0,
+                stock:0,
+                ubicacion : '',
+                arrayInsumo : [],
                 modal : 0,
                 tituloModal : '',
                 tipoAccion : 0,
-                errorCategoria : 0,
-                errorMostrarMsjCategoria : [],
+                errorInsumo : 0,
+                errorMostrarMsjInsumo : [],
                 pagination : {
                     'total' : 0,
                     'current_page' : 0,
@@ -155,9 +200,13 @@
                 },
                 offset : 3,
                 criterio : 'nombre',
-                buscar : ''
+                buscar : '',
+                arrayCategoria:[]
             }
         },
+        components: {
+    'barcode': VueBarcode
+  }, 
         computed:{
             isActived: function(){
                 return this.pagination.current_page;
@@ -188,13 +237,26 @@
             }
         },
         methods : {
-            listarCategoria (page,buscar,criterio){
+            listarInsumo (page,buscar,criterio){
                 let me=this;
-                var url= '/categoria?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
+                var url= '/insumo?page=' + page + '&buscar='+ buscar + '&criterio='+ criterio;
                 axios.get(url).then(function (response) {
                     var respuesta= response.data;
-                    me.arrayCategoria = respuesta.categorias.data;
+                    me.arrayInsumo = respuesta.insumos.data;
                     me.pagination= respuesta.pagination;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+            selectCategoria(){
+                 let me=this;
+                var url= '/categoria/selectCategoria';
+                axios.get(url).then(function (response) {
+                   // console.log(response);
+                    var respuesta= response.data;
+                    me.arrayCategoria = respuesta.categorias;
+                    
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -205,44 +267,52 @@
                 //Actualiza la página actual
                 me.pagination.current_page = page;
                 //Envia la petición para visualizar la data de esa página
-                me.listarCategoria(page,buscar,criterio);
+                me.listarInsumo(page,buscar,criterio);
             },
-            registrarCategoria(){
-                if (this.validarCategoria()){
+            registrarInsumo(){
+                if (this.validarInsumo()){
                     return;
                 }
                 
                 let me = this;
 
-                axios.post('/categoria/registrar',{
+                axios.post('/insumo/registrar',{
+                    'idcategoria':this.idcategoria,
+                    'codigo':this.codigo,
                     'nombre': this.nombre,
-                    'descripcion': this.descripcion
+                    'stock':this.stock,
+                    'precio_insumo':this.precio_insumo,
+                    'ubicacion': this.ubicacion
                 }).then(function (response) {
                     me.cerrarModal();
-                    me.listarCategoria(1,'','nombre');
+                    me.listarInsumo(1,'','nombre');
                 }).catch(function (error) {
                     console.log(error);
                 });
             },
-            actualizarCategoria(){
-               if (this.validarCategoria()){
+            actualizarInsumo(){
+               if (this.validarInsumo()){
                     return;
                 }
                 
                 let me = this;
 
-                axios.put('/categoria/actualizar',{
+                axios.put('/insumo/actualizar',{
+                    'idcategoria':this.idcategoria,
+                    'codigo':this.codigo,
                     'nombre': this.nombre,
-                    'descripcion': this.descripcion,
-                    'id': this.categoria_id
+                    'stock':this.stock,
+                    'precio_insumo':this.precio_insumo,
+                    'ubicacion': this.ubicacion,
+                    'id':this.insumo_id
                 }).then(function (response) {
                     me.cerrarModal();
-                    me.listarCategoria(1,'','nombre');
+                    me.listarInsumo(1,'','nombre');
                 }).catch(function (error) {
                     console.log(error);
                 }); 
             },
-              desactivarCategoria(id){
+              desactivarInsumo(id){
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success',
@@ -251,7 +321,7 @@
                 buttonsStyling: false,
                 })
                 swalWithBootstrapButtons.fire({
-                title: 'Estas seguro de desactivar esta categoria?',
+                title: 'Estas seguro de desactivar este insumo?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar!',
@@ -260,10 +330,10 @@
                 }).then((result) => {
                 if (result.value) {
                      let me = this;
-                    axios.put('/categoria/desactivar',{
+                    axios.put('/insumo/desactivar',{
                         'id': id
                     }).then(function (response) {
-                      me.listarCategoria(1,'','nombre');
+                      me.listarInsumo(1,'','nombre');
                          swalWithBootstrapButtons.fire(
                             'Desactivado!',
                             'El registro a sido desactivado con éxito.',
@@ -282,7 +352,7 @@
                 }
                 })
             },
-            activarCategoria(id){
+            activarInsumo(id){
                 const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success',
@@ -292,7 +362,7 @@
                 })
 
                 swalWithBootstrapButtons.fire({
-                title: 'Estas seguro de Activar esta categoria?',
+                title: 'Estas seguro de Activar este insumo?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Aceptar!',
@@ -302,10 +372,10 @@
                 if (result.value) {
                      let me = this;
 
-                    axios.put('/categoria/activar',{
+                    axios.put('/insumo/activar',{
                         'id': id
                     }).then(function (response) {
-                         me.listarCategoria(1,'','nombre');
+                         me.listarInsumo(1,'','nombre');
                          swalWithBootstrapButtons.fire(
                             'Activado!',
                             'El registro a sido activado con éxito.',
@@ -325,33 +395,48 @@
                 })
             },
 
-            validarCategoria(){
-                this.errorCategoria=0;
-                this.errorMostrarMsjCategoria =[];
+            validarInsumo(){
+                this.errorInsumo=0;
+                this.errorMostrarMsjInsumo =[];
 
-                if (!this.nombre) this.errorMostrarMsjCategoria.push("El nombre de la categoría no puede estar vacío.");
+                if(this.idcategoria==0)this.errorMostrarMsjInsumo.push('Seleccione una categoria');
+                if (!this.nombre) this.errorMostrarMsjInsumo.push("El nombre del insumo no puede estar vacío.");
+                if (!this.stock) this.errorMostrarMsjInsumo.push("El stock del insumo debe ser un número y no puede estar vacio.");
+                if (!this.precio_insumo) this.errorMostrarMsjInsumo.push("El precio del insumo debe ser un número y no puede estar vacio.");
 
-                if (this.errorMostrarMsjCategoria.length) this.errorCategoria = 1;
+                if (this.errorMostrarMsjInsumo.length) this.errorInsumo = 1;
 
-                return this.errorCategoria;
+                return this.errorInsumo;
             },
             cerrarModal(){
                 this.modal=0;
                 this.tituloModal='';
+                this.idcategoria=0;
+                this.nombre_categoria='';
+                this.codigo='';
                 this.nombre='';
-                this.descripcion='';
+                this.precio_insumo=0;
+                this.stock=0;
+                this.ubicacion='';
+                this.errorInsumo=0;
             },
             abrirModal(modelo, accion, data = []){
                 switch(modelo){
-                    case "categoria":
+                    case "insumo":
                     {
                         switch(accion){
                             case 'registrar':
                             {
                                 this.modal = 1;
-                                this.tituloModal = 'Registrar Categoría';
+                                this.tituloModal = 'Registrar Insumo';
+                                this.idcategoria=0;
+                                this.nombre_categoria='';
+                                this.codigo='';
                                 this.nombre= '';
-                                this.descripcion = '';
+                                this.precio_insumo=0;
+                                this.stock=0;
+                                this.ubicacion='';
+                                
                                 this.tipoAccion = 1;
                                 break;
                             }
@@ -359,20 +444,25 @@
                             {
                                 //console.log(data);
                                 this.modal=1;
-                                this.tituloModal='Actualizar categoría';
+                                this.tituloModal='Actualizar Insumo ';
                                 this.tipoAccion=2;
-                                this.categoria_id=data['id'];
-                                this.nombre = data['nombre'];
-                                this.descripcion= data['descripcion'];
+                                this.insumo_id=data['id'];
+                                this.idcategoria=data['idcategoria'];
+                                this.codigo=data['codigo'];
+                                this.nombre =data['nombre'];
+                                this.stock=data['stock'];
+                                this.precio_insumo=data['precio_insumo'];
+                                this.ubicacion= data['ubicacion'];
                                 break;
                             }
                         }
                     }
                 }
+                this.selectCategoria();
             }
         },
         mounted() {
-            this.listarCategoria(1,this.buscar,this.criterio);
+            this.listarInsumo(1,this.buscar,this.criterio);
         }
     }
 </script>
